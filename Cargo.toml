@@ -2,8 +2,17 @@
 name = "rcache"
 version = "0.1.0"
 edition = "2024"
+description = "Find what is using disk space in macOS caches, and how to clean it safely"
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "rcache"
+path = "src/main.rs"
 
 [dependencies]
+clap = { version = "4.6.7", features = ["derive"] }
 rayon = "1.12.0"
 
 [profile.release]
