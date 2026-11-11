@@ -3,17 +3,26 @@
 use clap::Parser;
 use rcache::report::{self, Options};
 use std::env;
-use std::io::{self, BufWriter, Write};
+use std::io::{self, BufWriter, IsTerminal, Write};
 use std::path::PathBuf;
 use std::process::ExitCode;
 
-/// Find what is using disk space in macOS caches.
+/// Find what is using disk space in macOS caches, with an explanation of
+/// what each cache is, whether it is safe to delete, and how to clean it.
 #[derive(Parser)]
 #[command(version)]
 struct Cli {
     /// Show the N largest caches.
     #[arg(short = 'n', long = "top", value_name = "N", default_value_t = 30)]
     top: usize,
+
+    /// Show every cache found (overrides --top).
+    #[arg(short, long)]
+    all: bool,
+
+    /// One line per cache, without explanations.
+    #[arg(short, long)]
+    brief: bool,
 }
 
 fn main() -> ExitCode {
@@ -26,8 +35,13 @@ fn main() -> ExitCode {
 
     let findings = rcache::find_caches(&home);
 
-    let options = Options { limit: cli.top };
-    let mut out = BufWriter::new(io::stdout().lock());
+    let stdout = io::stdout();
+    let options = Options {
+        limit: (!cli.all).then_some(cli.top),
+        explain: !cli.brief,
+        color: stdout.is_terminal() && env::var_os("NO_COLOR").is_none(),
+    };
+    let mut out = BufWriter::new(stdout.lock());
     match report::render(&mut out, &findings, &options).and_then(|()| out.flush()) {
         Ok(()) => ExitCode::SUCCESS,
         // e.g. `rcache | head`: the reader went away, which is not an error.
