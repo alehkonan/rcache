@@ -6,20 +6,37 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 /// Directories shared by many apps/tools: each immediate child gets its own row.
-pub const SHARED: &[&str] = &["~/Library/Caches", "/Library/Caches"];
+pub const SHARED: &[&str] = &["~/Library/Caches", "/Library/Caches", "~/.cache", "~/.npm"];
 
 /// Single-purpose cache directories, reported as one row each.
 /// None of them may live inside a [`SHARED`] directory, or it would be counted twice.
 pub const DEDICATED: &[&str] = &[
+    // Xcode / Apple development
     "~/Library/Developer/Xcode/DerivedData",
+    "~/Library/Developer/Xcode/Archives",
     "~/Library/Developer/Xcode/iOS DeviceSupport",
+    "~/Library/Developer/Xcode/watchOS DeviceSupport",
+    "~/Library/Developer/Xcode/tvOS DeviceSupport",
+    "~/Library/Developer/Xcode/visionOS DeviceSupport",
     "~/Library/Developer/CoreSimulator",
-    "~/Library/Logs",
-    "~/.cache",
-    "~/.npm",
-    "~/.gradle/caches",
-    "~/.cargo/registry",
     "~/.cocoapods",
+    // Package managers and build tools
+    "~/.cargo/registry",
+    "~/.cargo/git",
+    "~/.gradle/caches",
+    "~/.gradle/wrapper/dists",
+    "~/.m2/repository",
+    "~/go/pkg/mod",
+    "~/Library/pnpm/store",
+    "~/.yarn/berry/cache",
+    "~/.bun/install/cache",
+    "~/.composer/cache",
+    // Editors
+    "~/Library/Application Support/Code/Cache",
+    "~/Library/Application Support/Code/CachedData",
+    "~/Library/Application Support/Code/CachedExtensionVSIXs",
+    // Logs
+    "~/Library/Logs",
 ];
 
 /// Every cache location from [`SHARED`] and [`DEDICATED`] that exists on this machine.
